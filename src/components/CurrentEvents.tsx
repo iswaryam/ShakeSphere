@@ -16,6 +16,11 @@ export const CurrentEvents: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchEvents = async () => {
+    if (!process.env.GEMINI_API_KEY) {
+      console.warn("GEMINI_API_KEY is missing. Please set it in your environment variables.");
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -46,6 +51,13 @@ export const CurrentEvents: React.FC = () => {
           date: "Summer 2026",
           type: "Festival",
           description: "Free performances of 'As You Like It'."
+        },
+        {
+          title: "The Tempest",
+          location: "Globe Theatre, London",
+          date: "Autumn 2026",
+          type: "Play",
+          description: "A magical production in the heart of London."
         }
       ]);
     } finally {
@@ -120,9 +132,14 @@ export const CurrentEvents: React.FC = () => {
                   </p>
                   
                   <div className="pt-2">
-                    <button className="text-xs font-bold text-amber-800 flex items-center gap-1 hover:underline">
+                    <a 
+                      href={`https://www.google.com/search?q=${encodeURIComponent(event.title + ' ' + event.location + ' Shakespeare')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-bold text-amber-800 flex items-center gap-1 hover:underline"
+                    >
                       View Details <ExternalLink size={12} />
-                    </button>
+                    </a>
                   </div>
                 </div>
               </motion.div>

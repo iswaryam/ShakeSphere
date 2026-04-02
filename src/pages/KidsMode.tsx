@@ -18,6 +18,11 @@ export const KidsMode: React.FC = () => {
 
   const fetchKidSummary = async (play: PlaySummary) => {
     setSelectedPlay(play);
+    if (!process.env.GEMINI_API_KEY) {
+      console.warn("GEMINI_API_KEY is missing. Please set it in your environment variables.");
+      setAiSummary(play.shortSummary);
+      return;
+    }
     setLoadingSummary(true);
     setAiSummary(null);
     try {
@@ -163,7 +168,7 @@ export const KidsMode: React.FC = () => {
                     Tell me again!
                   </button>
                   <a 
-                    href={`https://www.folger.edu/explore/shakespeares-works/${selectedPlay.title.toLowerCase().replace(/ /g, '-')}`}
+                    href={`https://www.folger.edu/explore/shakespeares-works/${selectedPlay.title.toLowerCase().replace(/['']/g, '').replace(/ /g, '-')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-6 py-3 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-full font-bold transition-all border-2 border-stone-300"
@@ -178,8 +183,11 @@ export const KidsMode: React.FC = () => {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="py-12 text-center text-stone-400 italic">
-        <p>ShakeSphere Kids — Making the Bard fun for everyone!</p>
+      <footer className="py-12 text-center text-stone-400 italic space-y-4">
+        <div className="flex flex-col items-center justify-center gap-2 text-lg not-italic font-serif">
+          <p className="text-stone-800">Created by: <a href="https://www.linkedin.com/in/iswarya/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-bold">Iswarya Murali</a></p>
+          <p className="text-stone-800">GitHub: <a href="https://github.com/iswaryam/shakesphere" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-bold">shakesphere</a></p>
+        </div>
       </footer>
     </div>
   );

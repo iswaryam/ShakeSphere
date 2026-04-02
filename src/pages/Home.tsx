@@ -87,21 +87,13 @@ export const Home: React.FC = () => {
 
       {/* Footer */}
       <footer className="border-t border-[#d4c5a9] py-12 px-6 bg-[#fcf8e8]">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-2">
-            <ScrollText className="text-stone-600" size={20} />
-            <span className="font-serif text-lg font-bold text-stone-800">ShakeSphere</span>
-          </div>
-          <p className="text-stone-600 text-sm font-serif">
-            Built with passion for literature and data. © 2026
+        <div className="max-w-7xl mx-auto flex flex-col items-center gap-4">
+          <p className="text-stone-800 text-lg font-serif">
+            Created by: <a href="https://www.linkedin.com/in/iswarya/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-bold">Iswarya Murali</a>
           </p>
-          <div className="flex items-center gap-6 text-stone-600">
-            <Link to="/kids" className="hover:text-amber-900 transition-colors font-serif font-bold flex items-center gap-1">
-              <Star size={16} className="text-amber-500 fill-amber-500" /> Kids Mode
-            </Link>
-            <a href="#" className="hover:text-stone-900 transition-colors"><Twitter size={18} /></a>
-            <a href="#" className="hover:text-stone-900 transition-colors"><Github size={18} /></a>
-          </div>
+          <p className="text-stone-800 text-lg font-serif">
+            GitHub: <a href="https://github.com/iswaryam/shakesphere" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-bold">shakesphere</a>
+          </p>
         </div>
       </footer>
     </div>

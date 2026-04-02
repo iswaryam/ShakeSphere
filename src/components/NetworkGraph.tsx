@@ -56,10 +56,33 @@ export const NetworkGraph: React.FC = () => {
       svg.selectAll('*').remove();
 
       // Add a parchment-like background pattern/filter if needed, but we'll stick to CSS for simplicity
+      // Add glow filter
+      const defs = svg.append('defs');
+      const filter = defs.append('filter')
+        .attr('id', 'glow')
+        .attr('x', '-50%')
+        .attr('y', '-50%')
+        .attr('width', '200%')
+        .attr('height', '200%');
+
+      filter.append('feGaussianBlur')
+        .attr('stdDeviation', '3')
+        .attr('result', 'coloredBlur');
+
+      const feMerge = filter.append('feMerge');
+      feMerge.append('feMergeNode').attr('in', 'coloredBlur');
+      feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+      // Add gradient for nodes
+      const gradient = defs.append('radialGradient')
+        .attr('id', 'nodeGradient');
+      gradient.append('stop').attr('offset', '0%').attr('stop-color', '#fff').attr('stop-opacity', 0.3);
+      gradient.append('stop').attr('offset', '100%').attr('stop-color', 'currentColor').attr('stop-opacity', 1);
+
       const g = svg.append('g');
 
       const zoom = d3.zoom<SVGSVGElement, unknown>()
-        .scaleExtent([0.5, 3])
+        .scaleExtent([0.3, 3])
         .on('zoom', (event) => {
           g.attr('transform', event.transform);
         });
@@ -70,10 +93,10 @@ export const NetworkGraph: React.FC = () => {
       const links: (Link & d3.SimulationLinkDatum<d3.SimulationNodeDatum>)[] = filteredData.links.map(d => ({ ...d }));
 
       const simulation = d3.forceSimulation<Node & d3.SimulationNodeDatum>(nodes)
-        .force('link', d3.forceLink<Node & d3.SimulationNodeDatum, Link & d3.SimulationLinkDatum<d3.SimulationNodeDatum>>(links).id(d => d.id).distance(150))
-        .force('charge', d3.forceManyBody().strength(-500))
+        .force('link', d3.forceLink<Node & d3.SimulationNodeDatum, Link & d3.SimulationLinkDatum<d3.SimulationNodeDatum>>(links).id(d => d.id).distance(200))
+        .force('charge', d3.forceManyBody().strength(-800))
         .force('center', d3.forceCenter(width / 2, height / 2))
-        .force('collision', d3.forceCollide().radius(70));
+        .force('collision', d3.forceCollide().radius(80));
 
       const linkColors = {
         'motif': '#8b7355',
@@ -85,22 +108,31 @@ export const NetworkGraph: React.FC = () => {
       };
 
       const link = g.append('g')
-        .selectAll('line')
+        .selectAll('path')
         .data(links)
-        .join('line')
+        .join('path')
+        .attr('fill', 'none')
         .attr('stroke', (d: any) => linkColors[d.type as keyof typeof linkColors] || '#8b7355')
-        .attr('stroke-width', (d: any) => Math.sqrt(d.value) * 1.5)
-        .attr('stroke-opacity', 0.6)
-        .attr('class', 'transition-all duration-300 hover:stroke-opacity-100 cursor-help');
+        .attr('stroke-width', (d: any) => Math.sqrt(d.value) * 2)
+        .attr('stroke-opacity', 0.4)
+        .attr('class', 'transition-all duration-500 hover:stroke-opacity-100 cursor-help')
+        .style('filter', 'url(#glow)');
 
-      link.append('title')
-        .text((d: any) => `${d.type.toUpperCase()}: ${d.reason || 'Connection between ' + d.source.label + ' and ' + d.target.label}`);
+      // Add animated particles on links
+      const particles = g.append('g')
+        .selectAll('circle')
+        .data(links)
+        .join('circle')
+        .attr('r', 2)
+        .attr('fill', (d: any) => linkColors[d.type as keyof typeof linkColors] || '#8b7355')
+        .attr('opacity', 0.8)
+        .each(function(d: any) { (d as any).progress = Math.random(); });
 
       const node = g.append('g')
         .selectAll('g')
         .data(nodes)
         .join('g')
-        .attr('class', 'cursor-pointer')
+        .attr('class', 'cursor-pointer group')
         .on('click', (event, d) => {
           setSelectedNode(d);
           event.stopPropagation();
@@ -110,41 +142,64 @@ export const NetworkGraph: React.FC = () => {
           .on('drag', dragged)
           .on('end', dragended) as any);
 
+      // Node shadow/glow
       node.append('circle')
         .attr('r', (d: any) => {
-          if (d.group === 'play') return 24;
-          if (d.group === 'character') return 20;
+          if (d.group === 'play') return 32;
+          if (d.group === 'character') return 26;
+          return 22;
+        })
+        .attr('fill', (d: any) => d.color || '#8b7355')
+        .attr('opacity', 0.15)
+        .attr('class', 'animate-pulse');
+
+      node.append('circle')
+        .attr('r', (d: any) => {
+          if (d.group === 'play') return 26;
+          if (d.group === 'character') return 22;
           return 18;
         })
         .attr('fill', (d: any) => d.color || '#8b7355')
         .attr('stroke', '#3e2723')
         .attr('stroke-width', 2)
         .attr('stroke-dasharray', (d: any) => d.group === 'pop-culture' ? '4,2' : 'none')
-        .attr('class', 'transition-all duration-300 hover:stroke-amber-500 hover:stroke-[4px]');
+        .attr('class', 'transition-all duration-300 group-hover:stroke-amber-500 group-hover:stroke-[4px] shadow-lg');
 
       node.append('text')
         .attr('text-anchor', 'middle')
         .attr('dy', '.3em')
-        .attr('font-size', (d: any) => d.group === 'play' ? '20px' : '16px')
-        .text((d: any) => d.icon || '•');
+        .attr('font-size', (d: any) => d.group === 'play' ? '22px' : '18px')
+        .text((d: any) => d.icon || '•')
+        .attr('class', 'pointer-events-none select-none');
 
       node.append('text')
-        .attr('dx', 30)
+        .attr('dx', (d: any) => d.group === 'play' ? 35 : 30)
         .attr('dy', 5)
         .text((d: any) => d.label)
         .attr('fill', '#3e2723')
-        .attr('font-size', '14px')
+        .attr('font-size', (d: any) => d.group === 'play' ? '16px' : '14px')
         .attr('font-family', 'serif')
-        .attr('font-weight', (d: any) => d.group === 'play' ? 'bold' : 'normal')
-        .attr('class', 'pointer-events-none select-none');
+        .attr('font-weight', (d: any) => d.group === 'play' ? 'bold' : '500')
+        .attr('class', 'pointer-events-none select-none opacity-80 group-hover:opacity-100 transition-opacity');
 
       simulation.on('tick', () => {
-        link
-          .attr('x1', (d: any) => d.source.x)
-          .attr('y1', (d: any) => d.source.y)
-          .attr('x2', (d: any) => d.target.x)
-          .attr('y2', (d: any) => d.target.y)
-          .attr('stroke-width', (d: any) => Math.sqrt(d.value) * 1.5);
+        link.attr('d', (d: any) => {
+          const dx = d.target.x - d.source.x;
+          const dy = d.target.y - d.source.y;
+          const dr = Math.sqrt(dx * dx + dy * dy) * 1.5; // Curve factor
+          return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
+        });
+
+        particles.attr('transform', function(this: any, d: any) {
+          const parent = d3.select(this.parentNode).selectAll('path').filter((p: any) => p === d).node() as SVGPathElement;
+          if (!parent) return '';
+          
+          // Increment progress
+          d.progress = (d.progress + 0.005) % 1;
+          const l = parent.getTotalLength();
+          const p = parent.getPointAtLength(d.progress * l);
+          return `translate(${p.x},${p.y})`;
+        });
 
         node
           .attr('transform', (d: any) => `translate(${d.x},${d.y})`);
