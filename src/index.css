@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-[#fdfaf1] text-stone-900 antialiased;
+    background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+  }
+}
+
+.graph-node:hover {
+  filter: brightness(0.9);
+  cursor: pointer;
+}
+
+.graph-link {
+  stroke-opacity: 0.6;
+  transition: stroke-opacity 0.2s;
+}
+
+.graph-link:hover {
+  stroke-opacity: 1;
+}
+
+.parchment-card {
+  @apply bg-[#fcf8e8] border-2 border-[#d4c5a9] shadow-sm hover:shadow-md transition-all;
+}

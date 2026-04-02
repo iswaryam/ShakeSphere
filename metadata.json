@@ -1,0 +1,5 @@
+{
+  "name": "ShakeSphere",
+  "description": "An interactive, irreverent exploration of Shakespeare's works, themes, pop culture impact, and linguistic legacy using network graphs.",
+  "requestFramePermissions": []
+}
