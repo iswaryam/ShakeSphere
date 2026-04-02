@@ -1,6 +1,6 @@
 # ShakeSphere 🎭
 
-**ShakeSphere** is a comprehensive, interactive, and scholarly archive of William Shakespeare's works, exploring their interconnected universe from 16th-century plays to modern-day pop culture adaptations.
+**ShakeSphere** is my little homage project to William Shakespeare - exploring themes and motifs across plays through interactive graphs, and citing his influences on our language and modern-day pop culture. It also includes a "Kids Mode" to make it accessible and fun for younger readers!
 
 [![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://reactjs.org/)
